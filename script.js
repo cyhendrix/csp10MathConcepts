@@ -15,8 +15,8 @@ function grade(){let correct=0;lessons.forEach((l,i)=>{l.qs.forEach((_,j)=>{if(s
 function renderTabs(){tabs.innerHTML='';lessons.forEach((l,i)=>{const b=document.createElement('button');b.className='lesson-tab'+(state.current===i?' active':'')+(ready(i)?' done':'');b.textContent='Lesson '+(i+1);b.onclick=()=>go(i);tabs.appendChild(b)});const b=document.createElement('button');b.className='lesson-tab'+(state.current===4?' active':'');b.textContent='Results';b.disabled=!allReady()&&localStorage.getItem(SENT)!=='1';b.onclick=()=>go(4);tabs.appendChild(b)}
 function render(){
  renderTabs();const i=state.current;
- document.getElementById('finishCard').classList.toggle('hidden',i!==4);
- view.hidden=i===4;
+ const finish=document.getElementById('finishCard');finish.classList.toggle('hidden',i!==4);finish.hidden=i!==4;
+ view.hidden=i===4;if(i===4)view.replaceChildren();
  document.getElementById('progressText').textContent=i===4?'Results':'Lesson '+(i+1)+' of 4';
  document.getElementById('progressBar').style.width=((i===4?5:i+1)/5*100)+'%';
  if(i===4){showResults();return}
