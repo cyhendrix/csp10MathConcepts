@@ -41,18 +41,22 @@ function render(){
 }
 function renderNavigation(){const i=state.current,b=document.getElementById('nextLessonBtn'),note=document.getElementById('lessonCompletionNote');if(!b||!note)return;const remaining=lessons[i].qs.filter((_,j)=>!(state.answers[i+'-'+j]===true||(state.attempts[i+'-'+j]||0)>=2)).length;b.disabled=!ready(i);note.textContent=ready(i)?'✓ All lesson checks complete. You may continue.':(remaining?remaining+' multiple-choice question(s) still need completion. ':'')+(!state.passed[i]?'Complete the coding check to continue.':'');}
 function go(i){if(i===4&&!allReady())return;state.current=i;save();render();window.scrollTo(0,0)}
-function showResults(){const g=grade(),sent=localStorage.getItem(SENT)==='1';document.getElementById('completedCount').textContent=g.total+' / '+g.total;document.getElementById('finalScore').textContent=g.percent+'%';document.getElementById('submissionStatus').textContent=sent?'Grade submission was sent. Verify it in the Grade Response Checker page.':'All checks completed. Submit your grade below.';document.getElementById('submitResultsBtn').hidden=sent;document.getElementById('submitResultsBtn').disabled=sent}
+function showResults(){const g=grade(),sent=localStorage.getItem(SENT)==='1';document.getElementById('completedCount').textContent=g.total+' / '+g.total;document.getElementById('finalScore').textContent=g.percent+'%';document.getElementById('submissionStatus').textContent=sent?'Check Form Responses to verify your grade.':'All checks completed. Open the grading form below, then click Submit on the form.';document.getElementById('submitResultsBtn').hidden=sent;document.getElementById('submitResultsBtn').disabled=sent}
 studentForm.addEventListener('submit',e=>{e.preventDefault();student={first:document.getElementById('studentFirst').value.trim(),last:document.getElementById('studentLast').value.trim(),period:document.getElementById('studentPeriod').value};if(!student.first||!student.last||!student.period)return;localStorage.setItem(STUDENT,JSON.stringify(student));sessionStorage.setItem('csp10-started','1');state.current=0;save();begin()});
 function begin(){document.getElementById('studentScreen').hidden=true;document.getElementById('labContent').hidden=false;document.getElementById('labProgress').hidden=false;render()}
 // Always show student information before opening the lessons.
 document.getElementById('submitResultsBtn').onclick=()=>{
  if(!allReady()||!student)return;
- const button=document.getElementById('submitResultsBtn'),status=document.getElementById('submissionStatus');button.disabled=true;status.textContent='Sending grade…';
- const frame=document.createElement('iframe');frame.name='csp10GradeFrame_'+Date.now();frame.style.display='none';document.body.appendChild(frame);
- const form=document.createElement('form');form.method='POST';form.action='https://docs.google.com/forms/d/e/1FAIpQLSf9qAF0Ek04CLXOzReYWO-5YVDfY70LYoWWMLaLyC0bG70YUg/formResponse';form.target=frame.name;form.style.display='none';
- const fields={'entry.2089413779':student.last+', '+student.first,'entry.890934651':student.period,'entry.646173439':'Chapter 10 | Math Concepts','entry.962158861':String(grade().percent)};
- Object.entries(fields).forEach(([name,value])=>{const input=document.createElement('input');input.name=name;input.value=value;form.appendChild(input)});document.body.appendChild(form);
- let finished=false;frame.addEventListener('load',()=>{if(finished)return;finished=true;form.remove();frame.remove();button.disabled=false;status.textContent='Submission attempted. Please check Form Responses; a page load alone does not confirm Google accepted the grade.'});form.submit();
- setTimeout(()=>{if(!finished){button.disabled=false;status.textContent='Submission could not be confirmed. Check Form Responses before retrying.'}},12000);
+ const params=new URLSearchParams({
+  'entry.2089413779':student.last+', '+student.first,
+  'entry.890934651':student.period,
+  'entry.646173439':'Chapter 10 | Math Concepts',
+  'entry.962158861':String(grade().percent)
+ });
+ const url='https://docs.google.com/forms/d/e/1FAIpQLSf9qAF0Ek04CLXOzReYWO-5YVDfY70LYoWWMLaLyC0bG70YUg/viewform?usp=pp_url&'+params.toString();
+ const status=document.getElementById('submissionStatus');
+ const popup=window.open(url,'_blank','noopener');
+ status.textContent='Google Form opened with your information and grade. On the form, click Submit to record your score. Then verify it in Form Responses.';
+ if(!popup)status.innerHTML='Open the prefilled grading form and click Submit to record your score: <a href="'+url+'" target="_blank" rel="noopener">Open grading form</a>.';
 };
 document.getElementById('resetBtn').onclick=()=>{if(!confirm('Clear all saved Chapter 10 answers and student information?'))return;localStorage.removeItem(KEY);localStorage.removeItem(STUDENT);localStorage.removeItem(SENT);sessionStorage.removeItem('csp10-started');location.reload()};
