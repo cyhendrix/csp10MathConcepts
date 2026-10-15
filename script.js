@@ -41,12 +41,12 @@ function render(){
 }
 function renderNavigation(){const i=state.current,b=document.getElementById('nextLessonBtn'),note=document.getElementById('lessonCompletionNote');if(!b||!note)return;const remaining=lessons[i].qs.filter((_,j)=>!(state.answers[i+'-'+j]===true||(state.attempts[i+'-'+j]||0)>=2)).length;b.disabled=!ready(i);note.textContent=ready(i)?'✓ All lesson checks complete. You may continue.':(remaining?remaining+' multiple-choice question(s) still need completion. ':'')+(!state.passed[i]?'Complete the coding check to continue.':'');}
 function go(i){if(i===4&&!allReady())return;state.current=i;save();render();window.scrollTo(0,0)}
-function showResults(){const g=grade(),sent=localStorage.getItem(SENT)==='1';document.getElementById('completedCount').textContent=g.total+' / '+g.total;document.getElementById('finalScore').textContent=g.percent+'%';document.getElementById('submissionStatus').textContent=sent?'Check Form Responses to verify your grade.':'All checks completed. Open the grading form below, then click Submit on the form.';document.getElementById('submitResultsBtn').hidden=sent;document.getElementById('submitResultsBtn').disabled=sent}
+function showResults(){const g=grade(),sent=localStorage.getItem(SENT)==='1';document.getElementById('completedCount').textContent=g.total+' / '+g.total;document.getElementById('finalScore').textContent=g.percent+'%';document.getElementById('submissionStatus').textContent=sent?'Check Form Responses to verify your grade.':'All checks completed. Open the grading form below, then click Submit on the form.';document.getElementById('submitResultsBtn').hidden=false;document.getElementById('submitResultsBtn').disabled=false;document.getElementById('submitResultsBtn').textContent=sent?'Resend Saved Grade':'Submit Results'}
 studentForm.addEventListener('submit',e=>{e.preventDefault();student={first:document.getElementById('studentFirst').value.trim(),last:document.getElementById('studentLast').value.trim(),period:document.getElementById('studentPeriod').value};if(!student.first||!student.last||!student.period)return;localStorage.setItem(STUDENT,JSON.stringify(student));sessionStorage.setItem('csp10-started','1');state.current=0;save();begin()});
 function begin(){document.getElementById('studentScreen').hidden=true;document.getElementById('labContent').hidden=false;document.getElementById('labProgress').hidden=false;render()}
 // Always show student information before opening the lessons.
 document.getElementById('submitResultsBtn').onclick=()=>{
- if(!allReady()||!student)return;
+ if(!student)return;
  const params=new URLSearchParams({
   'entry.2089413779':student.last+', '+student.first,
   'entry.890934651':student.period,
