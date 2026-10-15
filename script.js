@@ -52,7 +52,7 @@ document.getElementById('submitResultsBtn').onclick=()=>{
  const form=document.createElement('form');form.method='POST';form.action='https://docs.google.com/forms/d/e/1FAIpQLSf9qAF0Ek04CLXOzReYWO-5YVDfY70LYoWWMLaLyC0bG70YUg/formResponse';form.target=frame.name;form.style.display='none';
  const fields={'entry.2089413779':student.last+', '+student.first,'entry.890934651':student.period,'entry.646173439':'Chapter 10 | Math Concepts','entry.962158861':String(grade().percent)};
  Object.entries(fields).forEach(([name,value])=>{const input=document.createElement('input');input.name=name;input.value=value;form.appendChild(input)});document.body.appendChild(form);
- let finished=false;frame.addEventListener('load',()=>{if(finished)return;finished=true;localStorage.setItem(SENT,'1');form.remove();frame.remove();showResults()});form.submit();
+ let finished=false;frame.addEventListener('load',()=>{if(finished)return;finished=true;form.remove();frame.remove();button.disabled=false;status.textContent='Submission attempted. Please check Form Responses; a page load alone does not confirm Google accepted the grade.'});form.submit();
  setTimeout(()=>{if(!finished){button.disabled=false;status.textContent='Submission could not be confirmed. Check Form Responses before retrying.'}},12000);
 };
 document.getElementById('resetBtn').onclick=()=>{if(!confirm('Clear all saved Chapter 10 answers and student information?'))return;localStorage.removeItem(KEY);localStorage.removeItem(STUDENT);localStorage.removeItem(SENT);sessionStorage.removeItem('csp10-started');location.reload()};
